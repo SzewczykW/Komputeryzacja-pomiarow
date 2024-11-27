@@ -1,3 +1,4 @@
+import csv
 import tkinter as tk
 from tkinter import ttk
 from threading import Thread, Event
@@ -40,20 +41,20 @@ class MagneticFieldControlGUI:
         # Konfiguracja PID
         self.create_pid_inputs()
 
-        # Nie mam pojęcia czy to będzie potrzebne, jeżeli nie, to zakomentować. Aktulanie nic nie robi.
+        # Konfiguracja napięcia i prądu
         self.create_voltage_current_inputs()
-        #Czytamy tak:
-        # voltage_value = float(self.voltage_entry.get())
-        # current_value = float(self.current_entry.get())
 
-
-        # Wyświetlanie bieżących wartości z czujnika
+        # Wyświetlanie bieżących wartości z czujników
         self.create_sensor_labels()
 
+        # Układ wykresów (obok siebie, wypełniający ekran)
         self.create_graph_layout()
 
         # Przyciski do sterowania start/stop
         self.create_control_buttons()
+
+        # Przyciski do zapisu danych
+        self.create_save_button()
 
     def create_pid_inputs(self):
         frame = ttk.LabelFrame(self.root, text="Konfiguracja PID")
@@ -115,7 +116,6 @@ class MagneticFieldControlGUI:
         graph_frame.columnconfigure(2, weight=1)
         graph_frame.rowconfigure(0, weight=1)
 
-
         voltage_fig = Figure(figsize=(4, 3), dpi=100)
         self.ax_voltage = voltage_fig.add_subplot(111)
         self.ax_voltage.set_title("Napięcie (V)")
@@ -125,7 +125,6 @@ class MagneticFieldControlGUI:
         self.voltage_line, = self.ax_voltage.plot([], [], color="blue", label="Napięcie")
         voltage_canvas = FigureCanvasTkAgg(voltage_fig, graph_frame)
         voltage_canvas.get_tk_widget().grid(row=0, column=0, sticky="nsew")
-
 
         current_fig = Figure(figsize=(4, 3), dpi=100)
         self.ax_current = current_fig.add_subplot(111)
@@ -156,6 +155,19 @@ class MagneticFieldControlGUI:
 
         self.stop_button = ttk.Button(frame, text="Stop", command=self.stop_loop)
         self.stop_button.grid(row=0, column=1, padx=5)
+
+    def create_save_button(self):
+        save_button = ttk.Button(self.root, text="Zapisz dane", command=self.save_to_file)
+        save_button.pack(pady=5)
+
+    def save_to_file(self):
+        filename = "dane_pomiarowe.csv"
+        with open(filename, mode="w", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerow(["Czas (s)", "Napięcie (V)", "Prąd (A)", "Pole magnetyczne (T)"])
+            for t, v, c, f in zip(self.time, self.voltage_data, self.current_data, self.field_data):
+                writer.writerow([t, v, c, f])
+        print(f"Dane zapisano do pliku {filename}")
 
     def update_pid(self):
         try:
