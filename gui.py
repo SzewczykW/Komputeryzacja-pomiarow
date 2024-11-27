@@ -1,12 +1,13 @@
 import csv
-import tkinter as tk
-from tkinter import ttk
-from threading import Thread, Event
-import time
 import random
-from matplotlib.figure import Figure
+import time
+import tkinter as tk
+
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
 from simple_pid import PID
+from threading import Thread, Event
+from tkinter import ttk
 
 
 def read_hall_sensor():
@@ -75,7 +76,9 @@ class MagneticFieldControlGUI:
         self.kd_entry.insert(0, "0.0")
         self.kd_entry.grid(row=2, column=1)
 
-        ttk.Label(frame, text="Wartość zadana pola magnetycznego (T):").grid(row=3, column=0, padx=5, pady=5)
+        ttk.Label(frame, text="Wartość zadana pola magnetycznego (T):").grid(
+            row=3, column=0, padx=5, pady=5
+        )
         self.setpoint_entry = ttk.Entry(frame, width=10)
         self.setpoint_entry.insert(0, "1.0")
         self.setpoint_entry.grid(row=3, column=1)
@@ -98,13 +101,19 @@ class MagneticFieldControlGUI:
         self.current_entry.grid(row=1, column=1)
 
     def create_sensor_labels(self):
-        self.voltage_label = ttk.Label(self.root, text="Napięcie: 0.0 V", font=("Arial", 12))
+        self.voltage_label = ttk.Label(
+            self.root, text="Napięcie: 0.0 V", font=("Arial", 12)
+        )
         self.voltage_label.pack(pady=5)
 
-        self.current_label = ttk.Label(self.root, text="Prąd: 0.0 A", font=("Arial", 12))
+        self.current_label = ttk.Label(
+            self.root, text="Prąd: 0.0 A", font=("Arial", 12)
+        )
         self.current_label.pack(pady=5)
 
-        self.field_label = ttk.Label(self.root, text="Pole magnetyczne: 0.0 T", font=("Arial", 12))
+        self.field_label = ttk.Label(
+            self.root, text="Pole magnetyczne: 0.0 T", font=("Arial", 12)
+        )
         self.field_label.pack(pady=5)
 
     def create_graph_layout(self):
@@ -122,7 +131,9 @@ class MagneticFieldControlGUI:
         self.ax_voltage.set_xlabel("Czas (s)")
         self.ax_voltage.set_ylabel("Napięcie")
         self.ax_voltage.grid(True)
-        self.voltage_line, = self.ax_voltage.plot([], [], color="blue", label="Napięcie")
+        (self.voltage_line,) = self.ax_voltage.plot(
+            [], [], color="blue", label="Napięcie"
+        )
         voltage_canvas = FigureCanvasTkAgg(voltage_fig, graph_frame)
         voltage_canvas.get_tk_widget().grid(row=0, column=0, sticky="nsew")
 
@@ -132,7 +143,7 @@ class MagneticFieldControlGUI:
         self.ax_current.set_xlabel("Czas (s)")
         self.ax_current.set_ylabel("Prąd")
         self.ax_current.grid(True)
-        self.current_line, = self.ax_current.plot([], [], color="green", label="Prąd")
+        (self.current_line,) = self.ax_current.plot([], [], color="green", label="Prąd")
         current_canvas = FigureCanvasTkAgg(current_fig, graph_frame)
         current_canvas.get_tk_widget().grid(row=0, column=1, sticky="nsew")
 
@@ -142,7 +153,7 @@ class MagneticFieldControlGUI:
         self.ax_field.set_xlabel("Czas (s)")
         self.ax_field.set_ylabel("Pole (T)")
         self.ax_field.grid(True)
-        self.field_line, = self.ax_field.plot([], [], color="red", label="Pole")
+        (self.field_line,) = self.ax_field.plot([], [], color="red", label="Pole")
         field_canvas = FigureCanvasTkAgg(field_fig, graph_frame)
         field_canvas.get_tk_widget().grid(row=0, column=2, sticky="nsew")
 
@@ -157,15 +168,21 @@ class MagneticFieldControlGUI:
         self.stop_button.grid(row=0, column=1, padx=5)
 
     def create_save_button(self):
-        save_button = ttk.Button(self.root, text="Zapisz dane", command=self.save_to_file)
+        save_button = ttk.Button(
+            self.root, text="Zapisz dane", command=self.save_to_file
+        )
         save_button.pack(pady=5)
 
     def save_to_file(self):
         filename = "dane_pomiarowe.csv"
         with open(filename, mode="w", newline="") as file:
             writer = csv.writer(file)
-            writer.writerow(["Czas (s)", "Napięcie (V)", "Prąd (A)", "Pole magnetyczne (T)"])
-            for t, v, c, f in zip(self.time, self.voltage_data, self.current_data, self.field_data):
+            writer.writerow(
+                ["Czas (s)", "Napięcie (V)", "Prąd (A)", "Pole magnetyczne (T)"]
+            )
+            for t, v, c, f in zip(
+                self.time, self.voltage_data, self.current_data, self.field_data
+            ):
                 writer.writerow([t, v, c, f])
         print(f"Dane zapisano do pliku {filename}")
 
